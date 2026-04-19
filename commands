@@ -1,28 +1,57 @@
 {
-    "id": "test-evolve-002",
-    "evolveId": "test-evolve-002",
-    "correlationId": "75118c82-753f-4ce5-8a70-b8b9e007e2da",
-    "fintechId": "fintech-test-001",
-    "amount": "100.00",
-    "taxId": "123456789",
-    "userIsBusiness": false,
-    "state": "tmsCompleted",
-    "sourceAccountId": "8bf71fb5-7e74-473d-b5b0-f7d9d6c10472",
-    "sourceLedgerId": "d03d031e-6377-40e9-9b95-3ba7b0c5a104",
-    "sourceEntityId": "aa1c2a5f-ae5c-431c-870c-ca093ba8358d",
-    "destinationAccountId": "1e9c0832-580a-4173-ad88-453358f42446",
-    "destinationLedgerId": "b02c9502-0fa0-4ecd-98f1-ae5cfcacf687",
-    "destinationEntityId": "6569f147-7d7e-4511-b12a-f7cf7c58e05b",
-    "transactionFlags": [
-        "R0: TMS Cleared (Stub)",
-        "R0: TMS Cleared (Stub)"
-    ],
-    "receivedAt": "2026-04-19T02:21:56.248452+00:00",
-    "lastUpdatedAt": "2026-04-19T02:26:34.0575771+00:00",
-    "ttl": -1,
-    "_rid": "k8UbAKch5xMJAAAAAAAAAA==",
-    "_self": "dbs/k8UbAA==/colls/k8UbAKch5xM=/docs/k8UbAKch5xMJAAAAAAAAAA==/",
-    "_etag": "\"0b0032b1-0000-0300-0000-69e43d590000\"",
+    "id": "d3a68d35-3fcb-4680-a05b-3b1bbac4806b",
+    "LedgerId": "52db98fa-c106-4422-962f-d299144fd6fc",
+    "AccountNumber": "123123123",
+    "Amount": 100,
+    "Code": null,
+    "GluId": "52db98fa-c106-4422-962f-d299144fd6fe",
+    "Trace": {
+        "ValueKind": 3
+    },
+    "TransactionId": "SenderRef03",
+    "Kind": "tptch.send",
+    "BatchId": "8dfb86e1-e049-4468-926f-51e4330b4982",
+    "Status": "Completed",
+    "Metadata": {
+        "Account": {
+            "ValueKind": 3
+        },
+        "RemoteAccount": {
+            "ValueKind": 3
+        },
+        "gluId": {
+            "ValueKind": 3
+        },
+        "postedAt": "2026-03-26T03:54:06.1485216Z"
+    },
+    "CreatedAt": "2026-03-26T03:54:06.115546Z",
+    "_rid": "uTljAJY3Gg8GAAAAAAAAAA==",
+    "_self": "dbs/uTljAA==/colls/uTljAJY3Gg8=/docs/uTljAJY3Gg8GAAAAAAAAAA==/",
+    "_etag": "\"6a01a461-0000-0300-0000-69e297600000\"",
     "_attachments": "attachments/",
-    "_ts": 1776565593
+    "_ts": 1776457568
+}
+
+and this is ledger
+{
+    "id": "15541990-c0b2-4731-9093-c85282cc0479",
+    "AccountNumber": "9876543211",
+    "Currency": {
+        "Name": "USD",
+        "Symbol": "USD",
+        "BaseUnit": "Cent",
+        "Decimals": 2
+    },
+    "LastBalance": 0,
+    "Metadata": {
+        "accountId": "9876543211"
+    },
+    "CreatedAt": "2026-03-26T03:57:18.7561114Z",
+    "UpdatedAt": "2026-03-26T03:57:18.7561115Z",
+    "LedgerType": "prefund-ledger-v2",
+    "_rid": "uTljALtChTAFAAAAAAAAAA==",
+    "_self": "dbs/uTljAA==/colls/uTljALtChTA=/docs/uTljALtChTAFAAAAAAAAAA==/",
+    "_etag": "\"2901dd4b-0000-0300-0000-69cc5fe10000\"",
+    "_attachments": "attachments/",
+    "_ts": 1775001569
 }
