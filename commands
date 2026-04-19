@@ -1,52 +1,25 @@
-# 1. Create and enter directory
-mkdir PaymentServices.Compliance
-cd PaymentServices.Compliance
-
-# 2. Create solution
-dotnet new sln -n PaymentServices.Compliance
-
-# 3. Create worker project
-mkdir src
-cd src
-dotnet new worker -n PaymentServices.Compliance -f net10.0
-cd ..
-
-# 4. Add to solution
-dotnet sln add src/PaymentServices.Compliance.csproj
-
-# 5. Remove generated worker file
-rm src/Worker.cs
-
-# 6. Create folder structure
-cd src
-mkdir Functions Services Models Repositories Extensions
-cd ..
-
-# 7. Create deploy_parameters and pipelines
-mkdir -p deploy_parameters/DEV
-mkdir -p deploy_parameters/QA
-mkdir -p deploy_parameters/PROD
-mkdir -p pipelines
-
-# 8. Add packages
-cd src
-dotnet add package Microsoft.Azure.Functions.Worker --version 2.51.0
-dotnet add package Microsoft.Azure.Functions.Worker.Sdk --version 2.0.7
-dotnet add package Microsoft.Azure.Functions.Worker.Extensions.Http --version 3.3.0
-dotnet add package Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore --version 2.1.0
-dotnet add package Microsoft.Azure.Functions.Worker.Extensions.ServiceBus --version 5.22.0
-dotnet add package Microsoft.Extensions.Configuration.AzureAppConfiguration --version 8.0.0
-dotnet add package Azure.Identity --version 1.13.2
-dotnet add package Microsoft.Azure.Cosmos --version 3.46.0
-dotnet add package Newtonsoft.Json --version 13.0.3
-dotnet add package Azure.Messaging.ServiceBus --version 7.18.4
-dotnet add package Microsoft.ApplicationInsights --version 2.22.0
-dotnet add package Microsoft.ApplicationInsights.WorkerService --version 2.22.0
-dotnet add package Microsoft.Azure.Functions.Worker.ApplicationInsights --version 1.4.0
-dotnet add package Serilog --version 4.2.0
-dotnet add package Serilog.Extensions.Hosting --version 9.0.0
-dotnet add package Serilog.Sinks.ApplicationInsights --version 4.0.0
-dotnet add package PaymentServices.Shared --version 1.0.*
-
-# 9. Restore and build
-dotnet restore && dotnet build
+{
+    "id": "test-evolve-002",
+    "evolveId": "test-evolve-002",
+    "correlationId": "75118c82-753f-4ce5-8a70-b8b9e007e2da",
+    "fintechId": "fintech-test-001",
+    "amount": "100.00",
+    "taxId": "123456789",
+    "userIsBusiness": false,
+    "state": "accountResolutionCompleted",
+    "sourceAccountId": "8bf71fb5-7e74-473d-b5b0-f7d9d6c10472",
+    "sourceLedgerId": "d03d031e-6377-40e9-9b95-3ba7b0c5a104",
+    "sourceEntityId": "aa1c2a5f-ae5c-431c-870c-ca093ba8358d",
+    "destinationAccountId": "1e9c0832-580a-4173-ad88-453358f42446",
+    "destinationLedgerId": "b02c9502-0fa0-4ecd-98f1-ae5cfcacf687",
+    "destinationEntityId": "6569f147-7d7e-4511-b12a-f7cf7c58e05b",
+    "transactionFlags": [],
+    "receivedAt": "2026-04-19T02:21:56.248452+00:00",
+    "lastUpdatedAt": "2026-04-19T02:24:14.0890845+00:00",
+    "ttl": -1,
+    "_rid": "k8UbAKch5xMJAAAAAAAAAA==",
+    "_self": "dbs/k8UbAA==/colls/k8UbAKch5xM=/docs/k8UbAKch5xMJAAAAAAAAAA==/",
+    "_etag": "\"0b0015ad-0000-0300-0000-69e43ccd0000\"",
+    "_attachments": "attachments/",
+    "_ts": 1776565453
+}
