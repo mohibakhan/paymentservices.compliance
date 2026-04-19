@@ -1,0 +1,30 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "APPINSIGHTS_INSTRUMENTATIONKEY": "<local-app-insights-key>",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "<local-app-insights-connection-string>",
+
+    "app:AppSettings:COSMOS_ENDPOINT": "<cosmos-account-endpoint>",
+    "app:AppSettings:COSMOS_CONNSTRING": "<local-cosmos-connection-string>",
+    "app:AppSettings:COSMOS_DATABASE": "tptch",
+    "app:AppSettings:COSMOS_TRANSACTIONS_CONTAINER": "tchSendTransactions",
+    "app:AppSettings:COSMOS_CUSTOMERS_CONTAINER": "customers",
+
+    "app:AppSettings:SERVICE_BUS_CONNSTRING": "<service-bus-connection-string>",
+    "app:AppSettings:SERVICE_BUS_TOPIC": "payment-processing",
+    "app:AppSettings:SERVICE_BUS_KYC_SUBSCRIPTION": "kyc-check",
+    "app:AppSettings:SERVICE_BUS_TMS_SUBSCRIPTION": "tms-check",
+
+    "app:AppSettings:ALLOY_BASE_URL": "<alloy-base-url>",
+    "app:AppSettings:ALLOY_KYC_WORKFLOW_TOKEN": "<alloy-kyc-workflow-token>",
+    "app:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": "<alloy-kyc-workflow-secret>",
+    "app:AppSettings:ALLOY_TMS_WORKFLOW_TOKEN": "<alloy-tms-workflow-token>",
+    "app:AppSettings:ALLOY_TMS_WORKFLOW_SECRET": "<alloy-tms-workflow-secret>",
+
+    "telemetry:APP_INSIGHTS_CUSTOM_PROP_EVOLVE_TRAIN": "Digital",
+    "telemetry:APP_INSIGHTS_CUSTOM_PROP_EVOLVE_TEAM": "Services"
+  }
+}

@@ -1,0 +1,40 @@
+using PaymentServices.Shared.Models;
+
+namespace PaymentServices.Compliance.Models;
+
+/// <summary>
+/// Compliance-specific settings bound from <c>app:AppSettings</c>.
+/// </summary>
+public sealed class ComplianceSettings : AppSettings
+{
+    // -------------------------------------------------------------------------
+    // Alloy API — populated when Alloy integration is implemented
+    // -------------------------------------------------------------------------
+
+    /// <summary>Alloy base URL. e.g. https://sandbox.alloy.co</summary>
+    public string ALLOY_BASE_URL { get; set; } = string.Empty;
+
+    /// <summary>Alloy workflow token for KYC.</summary>
+    public string ALLOY_KYC_WORKFLOW_TOKEN { get; set; } = string.Empty;
+
+    /// <summary>Alloy workflow secret for KYC.</summary>
+    public string ALLOY_KYC_WORKFLOW_SECRET { get; set; } = string.Empty;
+
+    /// <summary>Alloy workflow token for TMS.</summary>
+    public string ALLOY_TMS_WORKFLOW_TOKEN { get; set; } = string.Empty;
+
+    /// <summary>Alloy workflow secret for TMS.</summary>
+    public string ALLOY_TMS_WORKFLOW_SECRET { get; set; } = string.Empty;
+
+    // -------------------------------------------------------------------------
+    // Cosmos
+    // -------------------------------------------------------------------------
+    public string COSMOS_TRANSACTIONS_CONTAINER { get; set; } = "tchSendTransactions";
+    public string COSMOS_CUSTOMERS_CONTAINER { get; set; } = "customers";
+
+    // -------------------------------------------------------------------------
+    // Service Bus subscriptions
+    // -------------------------------------------------------------------------
+    public string SERVICE_BUS_KYC_SUBSCRIPTION { get; set; } = "kyc-check";
+    public string SERVICE_BUS_TMS_SUBSCRIPTION { get; set; } = "tms-check";
+}
