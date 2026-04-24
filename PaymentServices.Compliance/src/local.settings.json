@@ -21,6 +21,9 @@
     "app:AppSettings:REDIS_CONNSTRING": "<redis-connection-string>",
     "app:AppSettings:KYC_CACHE_TTL_DAYS": "31",
 
+    "app:AppSettings:RUN_KYC": "true",
+    "app:AppSettings:RUN_TMS": "true",
+
     "app:AppSettings:ALLOY_BASE_URL": "<alloy-base-url>",
     "app:AppSettings:ALLOY_KYC_WORKFLOW_TOKEN": "<alloy-kyc-workflow-token>",
     "app:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": "<alloy-kyc-workflow-secret>",

@@ -1,6 +1,8 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using PaymentServices.Compliance.Models;
 using PaymentServices.Compliance.Repositories;
 using PaymentServices.Compliance.Services;
 using PaymentServices.Shared.Enums;
@@ -13,25 +15,34 @@ namespace PaymentServices.Compliance.Functions;
 /// <summary>
 /// Service Bus Trigger — subscribed to kyc-check subscription (state: KycPending).
 /// Runs KYC on source and destination in parallel.
-/// On pass  → publishes TmsPending.
-/// On fail  → publishes KycFailed or KycManualReview → EventNotification.
+///
+/// Feature flag RUN_KYC:
+///   true  → runs KYC via Alloy, advances to TmsPending on pass
+///   false → skips KYC entirely, advances directly to TmsPending
+///
+/// On pass        → publishes TmsPending
+/// On manual review → publishes KycManualReview → EventNotification
+/// On fail        → publishes KycFailed → EventNotification
 /// </summary>
 public sealed class KycFunction
 {
     private readonly IKycService _kycService;
     private readonly ITransactionStateRepository _transactionStateRepository;
     private readonly IServiceBusPublisher _publisher;
+    private readonly ComplianceSettings _settings;
     private readonly ILogger<KycFunction> _logger;
 
     public KycFunction(
         IKycService kycService,
         ITransactionStateRepository transactionStateRepository,
         IServiceBusPublisher publisher,
+        IOptions<ComplianceSettings> settings,
         ILogger<KycFunction> logger)
     {
         _kycService = kycService;
         _transactionStateRepository = transactionStateRepository;
         _publisher = publisher;
+        _settings = settings.Value;
         _logger = logger;
     }
 
@@ -52,25 +63,44 @@ public sealed class KycFunction
             message = ServiceBusPublisher.Deserialize(serviceBusMessage);
 
             _logger.LogInformation(
-                "KYC started. EvolveId={EvolveId} CorrelationId={CorrelationId}",
-                message.EvolveId, message.CorrelationId);
+                "KYC started. EvolveId={EvolveId} CorrelationId={CorrelationId} RunKyc={RunKyc}",
+                message.EvolveId, message.CorrelationId, _settings.RUN_KYC);
 
-            // Update state to KycPending in Cosmos
+            // -------------------------------------------------------------------------
+            // Feature flag — skip KYC if disabled
+            // -------------------------------------------------------------------------
+            if (!_settings.RUN_KYC)
+            {
+                _logger.LogInformation(
+                    "KYC disabled by feature flag. EvolveId={EvolveId} advancing directly to TMS.",
+                    message.EvolveId);
+
+                await _transactionStateRepository.UpdateStateAsync(
+                    message.EvolveId,
+                    TransactionState.KycCompleted,
+                    cancellationToken: cancellationToken);
+
+                message.State = TransactionState.TmsPending;
+                await _publisher.PublishAsync(message, cancellationToken);
+                await messageActions.CompleteMessageAsync(serviceBusMessage, cancellationToken);
+                return;
+            }
+
+            // -------------------------------------------------------------------------
+            // Run KYC
+            // -------------------------------------------------------------------------
             await _transactionStateRepository.UpdateStateAsync(
                 message.EvolveId,
                 TransactionState.KycPending,
                 cancellationToken: cancellationToken);
 
-            // Run KYC for source and destination in parallel
             var result = await _kycService.RunAsync(message, cancellationToken);
 
-            // Update party outcomes on message
             message.Source.KycOutcome = result.SourceOutcome;
             message.Destination.KycOutcome = result.DestinationOutcome;
 
             if (!result.Passed)
             {
-                // Determine terminal state
                 var isManualReview = result.SourceOutcome == KycOutcome.ManualReview
                     || result.DestinationOutcome == KycOutcome.ManualReview;
 
@@ -96,7 +126,6 @@ public sealed class KycFunction
                     },
                     cancellationToken);
 
-                // Publish to EventNotification
                 await _publisher.PublishAsync(message, cancellationToken);
                 await messageActions.CompleteMessageAsync(serviceBusMessage, cancellationToken);
                 return;

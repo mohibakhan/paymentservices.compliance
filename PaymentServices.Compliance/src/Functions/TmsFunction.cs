@@ -1,6 +1,8 @@
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using PaymentServices.Compliance.Models;
 using PaymentServices.Compliance.Repositories;
 using PaymentServices.Compliance.Services;
 using PaymentServices.Shared.Enums;
@@ -13,25 +15,34 @@ namespace PaymentServices.Compliance.Functions;
 /// <summary>
 /// Service Bus Trigger — subscribed to tms-check subscription (state: TmsPending).
 /// Runs TMS on source and destination in parallel.
-/// On pass  → publishes TmsCompleted → Transfer.
-/// On fail  → publishes TmsComplianceAlert or TmsFailed → EventNotification.
+///
+/// Feature flag RUN_TMS:
+///   true  → runs TMS via Alloy, advances to TmsCompleted on pass
+///   false → skips TMS entirely, advances directly to TmsCompleted
+///
+/// On pass            → publishes TmsCompleted → Transfer
+/// On compliance alert → publishes TmsComplianceAlert → EventNotification
+/// On fail            → publishes TmsFailed → EventNotification
 /// </summary>
 public sealed class TmsFunction
 {
     private readonly ITmsService _tmsService;
     private readonly ITransactionStateRepository _transactionStateRepository;
     private readonly IServiceBusPublisher _publisher;
+    private readonly ComplianceSettings _settings;
     private readonly ILogger<TmsFunction> _logger;
 
     public TmsFunction(
         ITmsService tmsService,
         ITransactionStateRepository transactionStateRepository,
         IServiceBusPublisher publisher,
+        IOptions<ComplianceSettings> settings,
         ILogger<TmsFunction> logger)
     {
         _tmsService = tmsService;
         _transactionStateRepository = transactionStateRepository;
         _publisher = publisher;
+        _settings = settings.Value;
         _logger = logger;
     }
 
@@ -52,25 +63,46 @@ public sealed class TmsFunction
             message = ServiceBusPublisher.Deserialize(serviceBusMessage);
 
             _logger.LogInformation(
-                "TMS started. EvolveId={EvolveId} CorrelationId={CorrelationId}",
-                message.EvolveId, message.CorrelationId);
+                "TMS started. EvolveId={EvolveId} CorrelationId={CorrelationId} RunTms={RunTms}",
+                message.EvolveId, message.CorrelationId, _settings.RUN_TMS);
 
-            // Update state to TmsPending in Cosmos
+            // -------------------------------------------------------------------------
+            // Feature flag — skip TMS if disabled
+            // -------------------------------------------------------------------------
+            if (!_settings.RUN_TMS)
+            {
+                _logger.LogInformation(
+                    "TMS disabled by feature flag. EvolveId={EvolveId} advancing directly to Transfer.",
+                    message.EvolveId);
+
+                await _transactionStateRepository.UpdateStateAsync(
+                    message.EvolveId,
+                    TransactionState.TmsCompleted,
+                    cancellationToken: cancellationToken);
+
+                message.State = TransactionState.TmsCompleted;
+                message.TransactionFlags = ["R0: TMS Skipped (Feature Flag)"];
+
+                await _publisher.PublishAsync(message, cancellationToken);
+                await messageActions.CompleteMessageAsync(serviceBusMessage, cancellationToken);
+                return;
+            }
+
+            // -------------------------------------------------------------------------
+            // Run TMS
+            // -------------------------------------------------------------------------
             await _transactionStateRepository.UpdateStateAsync(
                 message.EvolveId,
                 TransactionState.TmsPending,
                 cancellationToken: cancellationToken);
 
-            // Run TMS for source and destination in parallel
             var result = await _tmsService.RunAsync(message, cancellationToken);
 
-            // Update party outcomes on message
             message.Source.TmsOutcome = result.SourceOutcome;
             message.Destination.TmsOutcome = result.DestinationOutcome;
 
             if (!result.Passed)
             {
-                // Determine terminal state
                 var isComplianceAlert = result.SourceOutcome == TmsOutcome.ComplianceAlert
                     || result.DestinationOutcome == TmsOutcome.ComplianceAlert;
 
@@ -96,7 +128,6 @@ public sealed class TmsFunction
                     },
                     cancellationToken);
 
-                // Publish to EventNotification
                 await _publisher.PublishAsync(message, cancellationToken);
                 await messageActions.CompleteMessageAsync(serviceBusMessage, cancellationToken);
                 return;

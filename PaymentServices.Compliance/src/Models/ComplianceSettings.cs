@@ -50,4 +50,23 @@ public sealed class ComplianceSettings : AppSettings
     /// Only Approved results are cached — Manual Review and Denied always re-check Alloy.
     /// </summary>
     public int KYC_CACHE_TTL_DAYS { get; set; } = 31;
+
+    // -------------------------------------------------------------------------
+    // Feature flags — toggle compliance checks independently
+    // Configurable via Azure App Configuration without redeployment
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// When true, runs KYC check for source and destination.
+    /// When false, skips KYC entirely and advances directly to TmsPending.
+    /// Default: true
+    /// </summary>
+    public bool RUN_KYC { get; set; } = true;
+
+    /// <summary>
+    /// When true, runs TMS screening for source and destination.
+    /// When false, skips TMS and advances directly to TransferPending.
+    /// Default: true
+    /// </summary>
+    public bool RUN_TMS { get; set; } = true;
 }
