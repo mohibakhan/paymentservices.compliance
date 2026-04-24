@@ -18,6 +18,9 @@
     "app:AppSettings:SERVICE_BUS_KYC_SUBSCRIPTION": "kyc-check",
     "app:AppSettings:SERVICE_BUS_TMS_SUBSCRIPTION": "tms-check",
 
+    "app:AppSettings:REDIS_CONNSTRING": "<redis-connection-string>",
+    "app:AppSettings:KYC_CACHE_TTL_DAYS": "31",
+
     "app:AppSettings:ALLOY_BASE_URL": "<alloy-base-url>",
     "app:AppSettings:ALLOY_KYC_WORKFLOW_TOKEN": "<alloy-kyc-workflow-token>",
     "app:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": "<alloy-kyc-workflow-secret>",

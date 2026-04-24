@@ -37,4 +37,17 @@ public sealed class ComplianceSettings : AppSettings
     // -------------------------------------------------------------------------
     public string SERVICE_BUS_KYC_SUBSCRIPTION { get; set; } = "kyc-check";
     public string SERVICE_BUS_TMS_SUBSCRIPTION { get; set; } = "tms-check";
+
+    // -------------------------------------------------------------------------
+    // Redis cache
+    // -------------------------------------------------------------------------
+
+    /// <summary>Azure Cache for Redis connection string — same instance as AccountResolution.</summary>
+    public string REDIS_CONNSTRING { get; set; } = string.Empty;
+
+    /// <summary>
+    /// KYC result cache TTL in days. Default: 31 (matches original Node 31-day window).
+    /// Only Approved results are cached — Manual Review and Denied always re-check Alloy.
+    /// </summary>
+    public int KYC_CACHE_TTL_DAYS { get; set; } = 31;
 }

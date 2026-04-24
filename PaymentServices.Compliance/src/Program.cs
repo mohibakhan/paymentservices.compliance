@@ -12,6 +12,7 @@ using PaymentServices.Compliance.Services;
 using PaymentServices.Shared.Extensions;
 using Serilog;
 using Serilog.Events;
+using StackExchange.Redis;
 
 namespace PaymentServices.Compliance;
 
@@ -56,6 +57,19 @@ public static class Program
 
                 // Alloy HTTP client
                 services.AddHttpClient<IAlloyClient, AlloyClient>();
+
+                // Redis cache — singleton connection, silent fallback if unavailable
+                var redisConnString = config["app:AppSettings:REDIS_CONNSTRING"] ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(redisConnString))
+                {
+                    services.AddSingleton<IConnectionMultiplexer>(_ =>
+                        ConnectionMultiplexer.Connect(redisConnString));
+                    services.AddSingleton<ICacheService, RedisCacheService>();
+                }
+                else
+                {
+                    services.AddSingleton<ICacheService, NoOpCacheService>();
+                }
 
                 // Repositories
                 services.AddTransient<ITransactionStateRepository, TransactionStateRepository>();
