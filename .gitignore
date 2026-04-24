@@ -15,3 +15,6 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+git rm --cached src/local.settings.json
+git commit -m "Remove local.settings.json from tracking"
