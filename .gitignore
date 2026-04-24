@@ -1,0 +1,17 @@
+# Azure Functions local settings — contains secrets, never commit
+local.settings.json
+
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+
+# Rider
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
