@@ -1,0 +1,42 @@
+dev_ea_env.parameters.json
+dev_ea_keyvault.parameters.json
+
+{
+  "telemetry:APP_INSIGHTS-CUSTOM_PROP_EVOLVE_TRAIN": "Digital",
+  "telemetry:APP_INSIGHTS-CUSTOM_PROP_EVOLVE_TEAM": "Services",
+  "compliance:AppSettings:COSMOS_DATABASE": "tptch",
+  "compliance:AppSettings:COSMOS_TRANSACTIONS_CONTAINER": "tchSendTransactions",
+  "compliance:AppSettings:COSMOS_CUSTOMERS_CONTAINER": "customers",
+  "compliance:AppSettings:SERVICE_BUS_TOPIC": "payment-processing",
+  "compliance:AppSettings:SERVICE_BUS_KYC_SUBSCRIPTION": "kyc-check",
+  "compliance:AppSettings:SERVICE_BUS_TMS_SUBSCRIPTION": "tms-check",
+  "compliance:AppSettings:REDIS_ACCOUNT_CACHE_TTL_HOURS": "1",
+  "compliance:AppSettings:KYC_CACHE_TTL_DAYS": "31",
+  "compliance:AppSettings:RUN_KYC": "false",
+  "compliance:AppSettings:RUN_TMS": "true",
+  "compliance:AppSettings:ALLOY_BASE_URL": "https://sandbox.alloy.co"
+}
+
+{
+  "compliance:AppSettings:COSMOS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-COSMOS-CONNSTRING"
+  },
+  "compliance:AppSettings:SERVICE_BUS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-SERVICE-BUS-CONNSTRING"
+  },
+  "compliance:AppSettings:REDIS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-REDIS-CONNSTRING"
+  },
+  "compliance:AppSettings:ALLOY_KYC_WORKFLOW_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-ALLOY-KYC-WORKFLOW-TOKEN"
+  },
+  "compliance:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-ALLOY-KYC-WORKFLOW-SECRET"
+  },
+  "compliance:AppSettings:ALLOY_TMS_WORKFLOW_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-ALLOY-TMS-WORKFLOW-TOKEN"
+  },
+  "compliance:AppSettings:ALLOY_TMS_WORKFLOW_SECRET": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-ALLOY-TMS-WORKFLOW-SECRET"
+  }
+}
