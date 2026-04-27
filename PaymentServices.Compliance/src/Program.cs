@@ -13,12 +13,15 @@ using PaymentServices.Shared.Extensions;
 using Serilog;
 using Serilog.Events;
 using StackExchange.Redis;
+using CosmosContainer = Microsoft.Azure.Cosmos.Container;
 
 namespace PaymentServices.Compliance;
 
 [ExcludeFromCodeCoverage]
 public static class Program
 {
+    private const string Prefix = "compliance:AppSettings";
+
     public static async Task Main(string[] args)
     {
         var host = new HostBuilder()
@@ -35,22 +38,22 @@ public static class Program
                 services.ConfigureFunctionsApplicationInsights();
 
                 // Shared infrastructure
-                services.AddPaymentAppSettings(config);
-                services.AddPaymentCosmosClient(config);
-                services.AddPaymentServiceBusPublisher(config);
+                services.AddPaymentAppSettings(config, Prefix);
+                services.AddPaymentCosmosClient(config, Prefix);
+                services.AddPaymentServiceBusPublisher(config, Prefix);
 
                 // Compliance-specific settings
                 services.AddOptions<ComplianceSettings>()
                     .Configure<IConfiguration>((settings, cfg) =>
-                        cfg.GetSection("app:AppSettings").Bind(settings));
+                        cfg.GetSection(Prefix).Bind(settings));
 
                 // Cosmos containers
-                var database = config["app:AppSettings:COSMOS_DATABASE"] ?? "tptch";
+                var database = config[$"{Prefix}:COSMOS_DATABASE"] ?? "tptch";
 
-                services.AddKeyedSingleton<Container>("transactions", (sp, _) =>
+                services.AddKeyedSingleton<CosmosContainer>("transactions", (sp, _) =>
                 {
                     var client = sp.GetRequiredService<CosmosClient>();
-                    var container = config["app:AppSettings:COSMOS_TRANSACTIONS_CONTAINER"]
+                    var container = config[$"{Prefix}:COSMOS_TRANSACTIONS_CONTAINER"]
                         ?? "tchSendTransactions";
                     return client.GetContainer(database, container);
                 });
@@ -59,7 +62,7 @@ public static class Program
                 services.AddHttpClient<IAlloyClient, AlloyClient>();
 
                 // Redis cache — singleton connection, silent fallback if unavailable
-                var redisConnString = config["app:AppSettings:REDIS_CONNSTRING"] ?? string.Empty;
+                var redisConnString = config[$"{Prefix}:REDIS_CONNSTRING"] ?? string.Empty;
                 if (!string.IsNullOrWhiteSpace(redisConnString))
                 {
                     services.AddSingleton<IConnectionMultiplexer>(_ =>
@@ -118,7 +121,7 @@ public static class Program
             {
                 options
                     .Connect(new Uri(appConfigUrl), credential)
-                    .Select("app:*")
+                    .Select("compliance:*")
                     .Select("telemetry:*")
                     .ConfigureKeyVault(kv => kv.SetCredential(credential));
             });
