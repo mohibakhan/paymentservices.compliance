@@ -217,3 +217,12 @@ public sealed class KycService : IKycService
         _ => KycOutcome.Unknown
     };
 }
+
+"compliance:AppSettings:ALLOY_BASE_URL": "https://sandbox.alloy.co",
+"compliance:AppSettings:ALLOY_SANDBOX": "true",
+"compliance:AppSettings:ALLOY_API_TOKEN": "<alloy-api-token>",
+"compliance:AppSettings:ALLOY_API_SECRET": "<alloy-api-secret>",
+"compliance:AppSettings:ALLOY_INDIVIDUAL_KYC_JOURNEY_TOKEN": "<individual-kyc-journey-token>",
+"compliance:AppSettings:ALLOY_BUSINESS_KYC_JOURNEY_TOKEN": "<business-kyc-journey-token>",
+"compliance:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": "<kyc-workflow-secret>",
+"compliance:AppSettings:ALLOY_TMS_JOURNEY_TOKEN": "<rtp-tms-journey-token>",
