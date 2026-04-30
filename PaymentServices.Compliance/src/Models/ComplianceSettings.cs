@@ -8,23 +8,32 @@ namespace PaymentServices.Compliance.Models;
 public sealed class ComplianceSettings : AppSettings
 {
     // -------------------------------------------------------------------------
-    // Alloy API — populated when Alloy integration is implemented
+    // Alloy API
     // -------------------------------------------------------------------------
 
-    /// <summary>Alloy base URL. e.g. https://sandbox.alloy.co</summary>
-    public string ALLOY_BASE_URL { get; set; } = string.Empty;
+    /// <summary>Alloy base URL.</summary>
+    public string ALLOY_BASE_URL { get; set; } = "https://sandbox.alloy.co";
 
-    /// <summary>Alloy workflow token for KYC.</summary>
-    public string ALLOY_KYC_WORKFLOW_TOKEN { get; set; } = string.Empty;
+    /// <summary>Set to true in DEV/QA to send alloy-sandbox header.</summary>
+    public bool ALLOY_SANDBOX { get; set; } = true;
 
-    /// <summary>Alloy workflow secret for KYC.</summary>
+    /// <summary>Alloy API token — used as username for Events API Basic Auth.</summary>
+    public string ALLOY_API_TOKEN { get; set; } = string.Empty;
+
+    /// <summary>Alloy API secret — used as password for Events API Basic Auth.</summary>
+    public string ALLOY_API_SECRET { get; set; } = string.Empty;
+
+    /// <summary>Individual KYC journey token — used as username for KYC Basic Auth.</summary>
+    public string ALLOY_INDIVIDUAL_KYC_JOURNEY_TOKEN { get; set; } = string.Empty;
+
+    /// <summary>Business KYC journey token.</summary>
+    public string ALLOY_BUSINESS_KYC_JOURNEY_TOKEN { get; set; } = string.Empty;
+
+    /// <summary>KYC workflow secret — used as password for KYC Basic Auth.</summary>
     public string ALLOY_KYC_WORKFLOW_SECRET { get; set; } = string.Empty;
 
-    /// <summary>Alloy workflow token for TMS.</summary>
-    public string ALLOY_TMS_WORKFLOW_TOKEN { get; set; } = string.Empty;
-
-    /// <summary>Alloy workflow secret for TMS.</summary>
-    public string ALLOY_TMS_WORKFLOW_SECRET { get; set; } = string.Empty;
+    /// <summary>RTP TMS journey token (for future use).</summary>
+    public string ALLOY_TMS_JOURNEY_TOKEN { get; set; } = string.Empty;
 
     // -------------------------------------------------------------------------
     // Cosmos

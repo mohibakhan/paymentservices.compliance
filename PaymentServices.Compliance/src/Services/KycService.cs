@@ -193,9 +193,14 @@ public sealed class KycService : IKycService
         {
             EntityId = party.EntityId ?? string.Empty,
             IsBusiness = isBusiness,
-            AddressCountryCode = isBusiness ? null : "US",
-            BusinessAddressCountryCode = isBusiness ? "US" : null,
-            BusinessFederalEin = isBusiness ? taxId : null
+            NameFirst = isBusiness ? null : party.Name.First,
+            NameLast = isBusiness ? null : party.Name.Last,
+            BusinessName = isBusiness ? party.Name.Company : null,
+            AddressLine1 = party.Address?.Line1,
+            AddressCity = party.Address?.City,
+            AddressState = party.Address?.State,
+            AddressPostalCode = party.Address?.PostalCode,
+            AddressCountryCode = party.Address?.CountryCode ?? "US"
         };
     }
 

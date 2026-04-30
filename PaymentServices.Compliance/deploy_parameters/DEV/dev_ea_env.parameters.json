@@ -1,0 +1,21 @@
+{
+  "telemetry:APP_INSIGHTS-CUSTOM_PROP_EVOLVE_TRAIN": "Digital",
+  "telemetry:APP_INSIGHTS-CUSTOM_PROP_EVOLVE_TEAM": "Services",
+
+  "compliance:AppSettings:COSMOS_DATABASE": "tptch",
+  "compliance:AppSettings:COSMOS_TRANSACTIONS_CONTAINER": "tchSendTransactions",
+  "compliance:AppSettings:COSMOS_CUSTOMERS_CONTAINER": "customers",
+
+  "compliance:AppSettings:SERVICE_BUS_TOPIC": "payment-processing",
+  "compliance:AppSettings:SERVICE_BUS_KYC_SUBSCRIPTION": "kyc-check",
+  "compliance:AppSettings:SERVICE_BUS_TMS_SUBSCRIPTION": "tms-check",
+
+  "compliance:AppSettings:REDIS_ACCOUNT_CACHE_TTL_HOURS": "1",
+  "compliance:AppSettings:KYC_CACHE_TTL_DAYS": "31",
+
+  "compliance:AppSettings:RUN_KYC": "false",
+  "compliance:AppSettings:RUN_TMS": "true",
+
+  "compliance:AppSettings:ALLOY_BASE_URL": "https://sandbox.alloy.co",
+  "compliance:AppSettings:ALLOY_SANDBOX": "true"
+}

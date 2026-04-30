@@ -1,0 +1,29 @@
+{
+  "compliance:AppSettings:COSMOS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-COSMOS-CONNSTRING"
+  },
+  "compliance:AppSettings:SERVICE_BUS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-SERVICE-BUS-CONNSTRING"
+  },
+  "compliance:AppSettings:REDIS_CONNSTRING": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/COMPLIANCE-REDIS-CONNSTRING"
+  },
+  "compliance:AppSettings:ALLOY_API_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-API-TOKEN"
+  },
+  "compliance:AppSettings:ALLOY_API_SECRET": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-API-SECRET"
+  },
+  "compliance:AppSettings:ALLOY_INDIVIDUAL_KYC_JOURNEY_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-INDIVIDUAL-KYC-JOURNEY-TOKEN"
+  },
+  "compliance:AppSettings:ALLOY_BUSINESS_KYC_JOURNEY_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-BUSINESS-KYC-JOURNEY-TOKEN"
+  },
+  "compliance:AppSettings:ALLOY_KYC_WORKFLOW_SECRET": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-KYC-WORKFLOW-SECRET"
+  },
+  "compliance:AppSettings:ALLOY_TMS_JOURNEY_TOKEN": {
+    "uri": "https://kv-pmtsvc-dev-centralus.vault.azure.net/secrets/ALLOY-TMS-JOURNEY-TOKEN"
+  }
+}

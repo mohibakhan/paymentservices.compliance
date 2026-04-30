@@ -8,8 +8,9 @@ namespace PaymentServices.Compliance.Services;
 public interface ITmsService
 {
     /// <summary>
-    /// Runs TMS checks for both source and destination parties in parallel.
-    /// Returns true if both pass, false if either triggers a compliance alert.
+    /// Sends a transaction event to Alloy TMS for the source party.
+    /// Destination counterparty details are included in the same event.
+    /// Returns the TMS check result — note outcome may be async via webhook.
     /// </summary>
     Task<TmsCheckResult> RunAsync(
         PaymentMessage message,
@@ -43,79 +44,83 @@ public sealed class TmsService : ITmsService
         CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
-            "Running TMS checks. EvolveId={EvolveId} SourceEntityId={SourceEntityId} DestinationEntityId={DestinationEntityId}",
+            "Running TMS. EvolveId={EvolveId} SourceEntityId={SourceEntityId} DestinationEntityId={DestinationEntityId}",
             message.EvolveId, message.Source.EntityId, message.Destination.EntityId);
 
-        // Build TMS inputs — separate transaction IDs for source and destination
-        var sourceInput = new AlloyTmsInput
+        var amount = decimal.Parse(message.Amount);
+
+        // Single transaction event — source entity sends, destination is counterparty
+        // Alloy requires external_account_id which maps to our account.id
+        var tmsInput = new AlloyTmsInput
         {
             EntityId = message.Source.EntityId ?? string.Empty,
-            TransactionId = $"{message.EvolveId}_s",
-            FintechId = message.FintechId,
-            SourceRemoteId = message.Source.RemoteAccountId,
-            DestinationRemoteId = message.Destination.RemoteAccountId
+            AccountId = message.Source.AccountId ?? string.Empty,
+            TransactionId = message.EvolveId,
+            Amount = amount,
+            CounterpartyEntityId = message.Destination.EntityId,
+            CounterpartyAccountId = message.Destination.AccountId,
+            CounterpartyNameFirst = message.Destination.Name?.First,
+            CounterpartyNameLast = message.Destination.Name?.Last,
+            CounterpartyAccountNumber = message.Destination.AccountNumber
         };
 
-        var destinationInput = new AlloyTmsInput
+        AlloyTmsResponse response;
+        try
         {
-            EntityId = message.Destination.EntityId ?? string.Empty,
-            TransactionId = $"{message.EvolveId}_d",
-            FintechId = message.FintechId,
-            SourceRemoteId = message.Source.RemoteAccountId,
-            DestinationRemoteId = message.Destination.RemoteAccountId
-        };
+            response = await _alloyClient.RunTmsAsync(tmsInput, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            // TMS errors default to Approved per original Node fallback behavior
+            _logger.LogWarning(ex,
+                "TMS call failed — defaulting to Approved. EvolveId={EvolveId}",
+                message.EvolveId);
 
-        // Run source and destination TMS in parallel
-        var sourceTask = _alloyClient.RunTmsAsync(sourceInput, cancellationToken);
-        var destinationTask = _alloyClient.RunTmsAsync(destinationInput, cancellationToken);
+            return new TmsCheckResult
+            {
+                Passed = true,
+                SourceOutcome = TmsOutcome.Approved,
+                DestinationOutcome = TmsOutcome.Approved,
+                Flags = ["R0: TMS Cleared (Fallback — Exception)"]
+            };
+        }
 
-        await Task.WhenAll(sourceTask, destinationTask);
-
-        var sourceResponse = await sourceTask;
-        var destinationResponse = await destinationTask;
-
-        var sourceOutcome = ParseTmsOutcome(sourceResponse.Summary.Outcome);
-        var destinationOutcome = ParseTmsOutcome(destinationResponse.Summary.Outcome);
+        var outcome = ParseTmsOutcome(response.Summary.Outcome);
 
         _logger.LogInformation(
-            "TMS results. EvolveId={EvolveId} SourceOutcome={SourceOutcome} DestinationOutcome={DestinationOutcome}",
-            message.EvolveId, sourceOutcome, destinationOutcome);
+            "TMS result. EvolveId={EvolveId} Outcome={Outcome} Tags={Tags}",
+            message.EvolveId, outcome, string.Join(", ", response.Summary.Tags));
 
-        // Compliance alert — hard stop, no transfer
-        if (sourceOutcome == TmsOutcome.ComplianceAlert || destinationOutcome == TmsOutcome.ComplianceAlert)
+        if (outcome == TmsOutcome.ComplianceAlert)
         {
-            var party = sourceOutcome == TmsOutcome.ComplianceAlert ? "Source" : "Destination";
             return new TmsCheckResult
             {
                 Passed = false,
-                SourceOutcome = sourceOutcome,
-                DestinationOutcome = destinationOutcome,
-                FailureReason = $"{party} TMS compliance alert.",
-                Flags = [.. sourceResponse.Summary.Tags, .. destinationResponse.Summary.Tags]
+                SourceOutcome = TmsOutcome.ComplianceAlert,
+                DestinationOutcome = TmsOutcome.Approved,
+                FailureReason = "TMS compliance alert.",
+                Flags = response.Summary.Tags
             };
         }
 
-        // Denied
-        if (sourceOutcome == TmsOutcome.Denied || destinationOutcome == TmsOutcome.Denied)
+        if (outcome == TmsOutcome.Denied)
         {
-            var party = sourceOutcome == TmsOutcome.Denied ? "Source" : "Destination";
             return new TmsCheckResult
             {
                 Passed = false,
-                SourceOutcome = sourceOutcome,
-                DestinationOutcome = destinationOutcome,
-                FailureReason = $"{party} TMS check denied.",
-                Flags = [.. sourceResponse.Summary.Tags, .. destinationResponse.Summary.Tags]
+                SourceOutcome = TmsOutcome.Denied,
+                DestinationOutcome = TmsOutcome.Approved,
+                FailureReason = "TMS check denied.",
+                Flags = response.Summary.Tags
             };
         }
 
-        // Both approved
         return new TmsCheckResult
         {
             Passed = true,
-            SourceOutcome = sourceOutcome,
-            DestinationOutcome = destinationOutcome,
-            Flags = [.. sourceResponse.Summary.Tags, .. destinationResponse.Summary.Tags]
+            SourceOutcome = TmsOutcome.Approved,
+            DestinationOutcome = TmsOutcome.Approved,
+            Flags = response.Summary.Tags
         };
     }
 
